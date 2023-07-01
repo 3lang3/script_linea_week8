@@ -35,7 +35,6 @@ export const run = async (wallet: ethers.Wallet) => {
     taskName: 'cashmere_claim_tusdt',
     walletAddr: wallet.address,
     withLoop: true,
-    force: true
   })
 
   await approveErc20(signer, tUSDT, ca);

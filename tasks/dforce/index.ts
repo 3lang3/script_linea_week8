@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { lineaProvider as provider, overrides, logGasCost } from '../base'
+import { lineaProvider as provider, overrides, logGasCost, getBalanceWithLog } from '../base'
 import { task } from '@/utils/utils';
 
 export const run = async (wallet: ethers.Wallet) => {
@@ -36,6 +36,13 @@ export const run = async (wallet: ethers.Wallet) => {
   abi = ['function borrow(uint256)']
   contract = new ethers.Contract(borrowCa, abi, signer);
   await task(async () => {
+    const balance = await getBalanceWithLog(signer);
+    const emitGas = await contract.estimateGas.borrow(100000);
+    const emitCost = emitGas.mul(await signer.getGasPrice());
+    if (emitCost.gt(balance)) {
+      console.log(`❌余额不足，跳过...`)
+      return false
+    }
     const tx = await contract.borrow(100000, await overrides(wallet.address));
     logGasCost(await tx.wait())
   }, {

@@ -1,3 +1,4 @@
+import { config } from "@/config";
 import { readFileSync } from "fs";
 import fse from 'fs-extra';
 export { setTimeout as sleep } from 'node:timers/promises';
@@ -35,11 +36,17 @@ export function loop(task) {
   return new Promise(async (resolve) => {
     while (true) {
       try {
-        await task();
-        resolve(true)
+        const r = await task();
+        resolve(r)
         break;
       } catch (error) {
-        console.log(`[loop] ${error?.reason || error?.message}`)
+        const msg = error?.reason || error?.message;
+        if (msg === 'insufficient funds for intrinsic transaction cost') {
+          console.log(`❌余额不足，跳过...`)
+          resolve(false)
+          break;
+        }
+        console.log(`[loop] ${msg}`)
       }
     }
   })
@@ -60,7 +67,7 @@ export async function task(cb, opts: {
   withLoop?: boolean
   force?: boolean
 }) {
-  const { taskName, walletAddr, withLoop, force, runCount = 1 } = opts
+  const { taskName, walletAddr, withLoop = config.loopUtilSuccess, force, runCount = 1 } = opts
   // 获取根目录logs文件下的task+walletAddr的json文件
   const logPath = path.join(process.cwd(), 'logs', walletAddr);
   const isExsit = await fse.pathExists(logPath)
@@ -72,18 +79,20 @@ export async function task(cb, opts: {
       ? fse.readJSONSync(logPath) || {}
       : fse.writeJSONSync(logPath, {});
   })
-  if (log?.[taskName] >= runCount && !force) return console.log(`👽[任务:${taskName}] 📝已执行，跳过...`)
-  console.log(`${text}⌛️执行中...`)
-  if (withLoop) {
-    await loop(cb);
-  } else {
-    await cb();
+  if (log?.[taskName] >= runCount && !force) {
+    // return console.log(`👽[任务:${taskName}] 📝已执行，跳过...`)
+    return
   }
+  console.log(`${text}⌛️执行中...`)
+  const r = withLoop ? await loop(cb) : await cb();
+  
   const count = (log?.[taskName] || 0) + 1;
 
-  // 确保文件写入成功
-  await loop(() => {
-    fse.writeJSONSync(logPath, { ...log, [taskName]: count });
-    console.log(`✅执行成功!`)
-  })
+  if (r !== false) {
+    // 确保文件写入成功
+    await loop(() => {
+      fse.writeJSONSync(logPath, { ...log, [taskName]: count });
+      console.log(`✅执行成功!`)
+    })
+  }
 }
