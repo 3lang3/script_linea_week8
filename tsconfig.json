@@ -1,0 +1,17 @@
+{
+  "ts-node": {
+    "swc": true
+  },
+  "compilerOptions": {
+    "target": "ESNext",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.cjs", "**/*.mjs", "global.d.ts"],
+  "exclude": ["node_modules"]
+}

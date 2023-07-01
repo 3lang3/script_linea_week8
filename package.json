@@ -1,0 +1,16 @@
+{
+	"scripts": {
+		"task": "node -r @swc-node/register index.ts"
+	},
+	"dependencies": {
+		"axios": "^1.4.0",
+		"crypto-js": "^4.1.1",
+		"ethers": "^5",
+		"fs-extra": "^11.1.1"
+	},
+	"devDependencies": {
+		"@swc-node/register": "^1.6.5",
+		"@types/node": "^20.3.1",
+		"typescript": "^5.1.3"
+	}
+}
