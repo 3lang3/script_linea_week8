@@ -5,8 +5,6 @@ import { loop, task } from '@/utils/utils';
 
 export const run = async (wallet: ethers.Wallet) => {
   const signer = wallet.connect(provider);
-
-
   const params = {
     fromChain: 59140,
     fromToken: '0xf56dc6695cf1f5c364edebc7dc7077ac9b586068',
@@ -19,15 +17,16 @@ export const run = async (wallet: ethers.Wallet) => {
     enableExpress: true,
   } as any;
 
-  let res: any;
-
-  await loop(async () => {
-    res = await axios.get('https://squid-api-git-linea-quests-0xsquid.vercel.app/v1/route', {
-      params
-    })
-  })
 
   await task(async () => {
+
+    let res: any;
+    await loop(async () => {
+      res = await axios.get('https://squid-api-git-linea-quests-0xsquid.vercel.app/v1/route', {
+        params
+      })
+    })
+
     await approveErc20(
       signer,
       '0xf56dc6695cf1f5c364edebc7dc7077ac9b586068',
@@ -47,13 +46,15 @@ export const run = async (wallet: ethers.Wallet) => {
 
   params.toToken = '0x57f1c63497aee0be305b8852b354cec793da43bb'
   params.receiveGasOnDestination = true
-  await loop(async () => {
-    res = await axios.get('https://squid-api-git-linea-quests-0xsquid.vercel.app/v1/route', {
-      params
-    })
-  })
+
 
   await task(async () => {
+    let res: any;
+    await loop(async () => {
+      res = await axios.get('https://squid-api-git-linea-quests-0xsquid.vercel.app/v1/route', {
+        params
+      })
+    })
     const tx = await signer.sendTransaction({
       to: res.data.route.transactionRequest.targetAddress,
       data: res.data.route.transactionRequest.data,

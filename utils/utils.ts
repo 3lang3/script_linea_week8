@@ -72,8 +72,8 @@ export async function task(cb, opts: {
       ? fse.readJSONSync(logPath)
       : fse.createFileSync(logPath);
   })
+  if (log?.[taskName] >= runCount && !force) return console.log(`👽[任务:${taskName}] 📝已执行，跳过`)
   console.log(`${text}⌛️执行中...`)
-  if (log?.[taskName] >= runCount && !force) return console.log(`📝找到执行记录，跳过`)
   if (withLoop) {
     await loop(cb);
   } else {

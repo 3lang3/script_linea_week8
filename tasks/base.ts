@@ -23,10 +23,9 @@ export const overrides = async (addr: string, limit = GASPRICE_LIMIT) => {
 export const approveErc20 = async (signer: ethers.Wallet, token: string, spender: string) => {
   const coin = new ethers.Contract(token, erc20abi, signer);
   const balance = await coin.balanceOf(signer.address);
-  console.log(`💰[Token余额] ${balance}`)
   const allowance = await coin.allowance(signer.address, spender);
   if (allowance.isZero()) {
-    console.log(`🤲[Token授权]\ntoken:${token}\nspender:${spender}`);
+    console.log(`⌛️ Token授权\ntoken:${token}\nspender:${spender}`);
     const approveTx = await coin.approve(spender, ethers.constants.MaxUint256, await overrides(signer.address));
     await approveTx.wait();
     console.log(`✅授权成功`)

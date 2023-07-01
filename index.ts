@@ -22,7 +22,7 @@ import * as zkex from './tasks/zkex';
 import * as symbiosis from './tasks/symbiosis';
 import * as cashmere from './tasks/cashmere';
 import * as openocean from './tasks/openocean';
-import * as noobysswap from './tasks/noobysswap';
+import * as noobysswap from './tasks/noobysswap/api';
 import * as compound from './tasks/compound';
 import * as zkusd from './tasks/zkusd';
 import { config } from './config';
