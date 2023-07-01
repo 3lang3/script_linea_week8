@@ -69,10 +69,10 @@ export async function task(cb, opts: {
   // 确保log文件存在
   await loop(async () => {
     log = isExsit
-      ? fse.readJSONSync(logPath)
-      : fse.createFileSync(logPath);
+      ? fse.readJSONSync(logPath) || {}
+      : fse.writeJSONSync(logPath, {});
   })
-  if (log?.[taskName] >= runCount && !force) return console.log(`👽[任务:${taskName}] 📝已执行，跳过`)
+  if (log?.[taskName] >= runCount && !force) return console.log(`👽[任务:${taskName}] 📝已执行，跳过...`)
   console.log(`${text}⌛️执行中...`)
   if (withLoop) {
     await loop(cb);

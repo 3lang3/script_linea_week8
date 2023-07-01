@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { poolAbi } from './abi';
-import { lineaProvider as provider, overrides, logGasCost } from '../base'
+import { lineaProvider as provider, overrides, logGasCost, approveErc20 } from '../base'
 import { task } from '@/utils/utils';
 
 export const swap = async (wallet: ethers.Wallet) => {
@@ -195,6 +195,7 @@ export const addLq = async (wallet: ethers.Wallet) => {
   const refundETH = new ethers.utils.Interface(['function refundETH() payable']).encodeFunctionData('refundETH', []);
   const contract = new ethers.Contract('0xacFa791C833120c769Fd3066c940B7D30Cd8BC73', ['function multicall(bytes[]) payable'], signer);
   await task(async () => {
+    await approveErc20(signer, '0xf56dc6695cF1f5c364eDEbC7Dc7077ac9B586068', contract.address)
     const tx = await contract.multicall([data, refundETH], {
       ...await overrides(wallet.address),
       value: ethers.utils.parseEther('0.01')

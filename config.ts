@@ -4,5 +4,5 @@ export const config = {
   /** 加价抢跑 */
   ADD_GAS_PRICE: 50,
   /** 是否强制执行到成功 */
-  loopUtilSuccess: false,
+  loopUtilSuccess: true,
 }

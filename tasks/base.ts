@@ -36,3 +36,8 @@ export const logGasCost = async (receipt: ethers.ContractReceipt) => {
   const cost = receipt.gasUsed.mul(receipt.effectiveGasPrice);
   console.log(`💰[花费Gas] ${ethers.utils.formatEther(cost)}Eth`)
 }
+
+export const logBalance = async (wallet: ethers.Wallet) => {
+  const balance = await wallet.getBalance();
+  console.log(`💰[ETH余额] ${ethers.utils.formatEther(balance)}Eth`)
+}
