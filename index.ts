@@ -25,6 +25,7 @@ import * as openocean from './tasks/openocean';
 import * as noobysswap from './tasks/noobysswap/api';
 import * as compound from './tasks/compound';
 import * as zkusd from './tasks/zkusd';
+import * as gridex from './tasks/gridex';
 import { config } from './config';
 import { loop } from './utils/utils';
 
@@ -42,6 +43,7 @@ const main = async (wallet: ethers.Wallet) => {
   await mendi.run(wallet)
   await dforce.run(wallet)
   await velocore.run(wallet)
+  await gridex.run(wallet)
   await zkex.run(wallet)
   await symbiosis.run(wallet)
   await openocean.run(wallet);
