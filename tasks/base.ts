@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 import erc20abi from '@/const/erc20.json'
 import { config } from '@/config';
 
-export const lineaProvider = new ethers.providers.JsonRpcProvider('https://linea-testnet.rpc.thirdweb.com')
+export const lineaProvider = new ethers.providers.JsonRpcProvider(config.rpc)
 
 const GASPRICE_LIMIT = config.MAX_GAS_PRICE || 5000;
 
