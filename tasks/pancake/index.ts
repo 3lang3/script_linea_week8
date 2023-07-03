@@ -178,7 +178,7 @@ export const addLq = async (wallet: ethers.Wallet) => {
     "stateMutability": "payable",
     "type": "function"
   }]);
-  let deadline = Math.floor(Date.now() / 1000) + 60 * 20;
+  let deadline = Math.floor(Date.now() / 1000) + 60 * 2000;
   let data = iface.encodeFunctionData('mint', [{
     token0: '0x2C1b868d6596a18e32E61B901E4060C872647b6C',
     token1: '0xf56dc6695cF1f5c364eDEbC7Dc7077ac9B586068',
@@ -204,6 +204,7 @@ export const addLq = async (wallet: ethers.Wallet) => {
   }, {
     taskName: 'pancake_addLq',
     walletAddr: wallet.address,
+    // force: true,
   })
 }
 
@@ -213,8 +214,19 @@ export const rmLq = async (wallet: ethers.Wallet) => {
   const signer = wallet.connect(provider);
   const contract = new ethers.Contract('0xacFa791C833120c769Fd3066c940B7D30Cd8BC73', poolAbi, signer);
   await task(async () => {
-    const tokenId = await contract.tokenOfOwnerByIndex(wallet.address, 0);
-    const position = await contract.positions(tokenId);
+    let position: any;
+    let tokenId: any
+    let tokenIndex = 0;
+    while (!position) {
+      tokenId = await contract.tokenOfOwnerByIndex(wallet.address, tokenIndex);
+      position = await contract.positions(tokenId);
+      if ((position.liquidity as ethers.BigNumber).isZero()) {
+        tokenIndex++;
+        position = null;
+      } else {
+        break;
+      }
+    }
     const collectParams = {
       tokenId: Number(tokenId),
       recipient: wallet.address,
@@ -224,7 +236,7 @@ export const rmLq = async (wallet: ethers.Wallet) => {
 
     const iface = new ethers.utils.Interface(poolAbi);
     const calldatas = [];
-    let deadline = Math.floor(Date.now() / 1000) + 60 * 20;
+    let deadline = Math.floor(Date.now() / 1000) + 60 * 2000;
     calldatas.push(iface.encodeFunctionData('decreaseLiquidity', [{
       tokenId: tokenId,
       liquidity: position.liquidity,
@@ -234,12 +246,13 @@ export const rmLq = async (wallet: ethers.Wallet) => {
     }]));
     calldatas.push(iface.encodeFunctionData('collect', [collectParams]))
     calldatas.push(iface.encodeFunctionData('unwrapWETH9', [ethers.constants.Zero, wallet.address,]));
-    calldatas.push(iface.encodeFunctionData('sweepToken', [position.token1, ethers.constants.Zero, wallet.address,]));
+    calldatas.push(iface.encodeFunctionData('sweepToken', [position.token1, ethers.constants.Zero, wallet.address]));
     const tx = await contract.multicall(calldatas, await overrides(wallet.address));
     logGasCost(await tx.wait());
   }, {
     taskName: 'pancake_rmLq',
     walletAddr: wallet.address,
+    force: true
   })
 }
 
