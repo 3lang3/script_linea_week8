@@ -73,8 +73,7 @@ export const run = async (wallet: ethers.Wallet) => {
   await task(async () => {
     const tUSDTBalance = await tUSDTContract.balanceOf(wallet.address);
     if (tUSDTBalance.isZero()) {
-      console.log('tUSDT余额为0, 无法完成任务');
-      return
+      throw Error('tUSDT余额为0, 无法完成任务');
     }
 
     await approveErc20(signer, tUSDT, ca);
