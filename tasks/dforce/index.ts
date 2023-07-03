@@ -33,7 +33,6 @@ export const run = async (wallet: ethers.Wallet) => {
   }, {
     taskName: 'dforce_mint',
     walletAddr: wallet.address,
-    force: true
   })
 
   const borrowCa = '0xC6d76E0706f3F75a13441Fc66A87D76C17BA6E70'

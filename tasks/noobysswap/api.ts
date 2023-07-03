@@ -4,6 +4,7 @@ import { task } from '@/utils/utils';
 export const swap = async (wallet: ethers.Wallet) => {
 
   await task(async () => {
+    console.log(`[noobysswap] swap 参数获取中...`)
     let r = await fetch("https://api.noobysswap.io/api/swap", {
       "headers": {
         "accept": "*/*",
@@ -32,6 +33,7 @@ export const swap = async (wallet: ethers.Wallet) => {
 
 export const addLq = async (wallet: ethers.Wallet) => {
   await task(async () => {
+    console.log(`[noobysswap] addLq 参数获取中...`)
     let r = await fetch("https://api.noobysswap.io/api/liquidity", {
       "headers": {
         "accept": "*/*",

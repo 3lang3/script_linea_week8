@@ -7,6 +7,7 @@ export const run = async (wallet: ethers.Wallet) => {
   const value = ethers.utils.parseEther('0.001');
   let r: any;
   await loop(async () => {
+    console.log(`[openocean] swap 参数获取中...`)
     r = await fetch(`https://ethapi.openocean.finance/v2/59140/swap?inTokenSymbol=ETH&inTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&outTokenSymbol=WETH&outTokenAddress=0x2C1b868d6596a18e32E61B901E4060C872647b6C&amount=${value.toString()}&gasPrice=1500000011&disabledDexIds=&slippage=100&account=${wallet.address}&referrer=0x3487ef9f9b36547e43268b8f0e2349a226c70b53`, {
       "headers": {
         "accept": "application/json, text/plain, */*",
