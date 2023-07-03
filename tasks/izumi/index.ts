@@ -72,13 +72,14 @@ export const swap = async (wallet: ethers.Wallet) => {
 
 export const addLimitOrder = async (wallet: ethers.Wallet) => {
   const signer = wallet.connect(provider);
-  const iface = new ethers.utils.Interface(limitOrderAbi);
+  const routerContract = new ethers.Contract("0x1eE5eDC5Fe498a2dD82862746D674DB2a5e7fef6", limitOrderAbi, signer)
+  const slot = await routerContract.getDeactiveSlot(signer.address);
   const calldatas = [];
   const amount = ethers.utils.parseEther('0.001');
   const deadline = Math.floor(Date.now() / 1000) + 2000 * 60;
   calldatas.push(
-    iface.encodeFunctionData('newLimOrder', [
-      "0",
+    routerContract.interface.encodeFunctionData('newLimOrder', [
+      slot,
       {
         tokenX: '0x67A1f4A939b477A6b7c5BF94D97E45dE87E608eF',
         tokenY: '0x876508837C162aCedcc5dd7721015E83cbb4e339',
@@ -90,7 +91,8 @@ export const addLimitOrder = async (wallet: ethers.Wallet) => {
       }
     ])
   )
-  calldatas.push('0x12210e8a');
+
+  calldatas.push(routerContract.interface.encodeFunctionData('refundETH', []));
   const contract = new ethers.Contract('0x1eE5eDC5Fe498a2dD82862746D674DB2a5e7fef6', ['function multicall(bytes[]) payable'], signer)
 
   await task(async () => {
