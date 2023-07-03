@@ -8,7 +8,7 @@
 
 > 确保调整后的Gas比上一次提交的Gas最少要高10%, 否则无法覆盖上一次的交易
 
-## Cashmere任务(25分)
+## 7.3更新 Cashmere任务(25分)
 
 需要**一个**钱包里面领了水测试tUSDT水，所有钱包即可完成任务。👉 [领水地址](https://faucet.cashmere.exchange/)
 
