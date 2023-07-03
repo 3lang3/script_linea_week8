@@ -252,7 +252,6 @@ export const rmLq = async (wallet: ethers.Wallet) => {
   }, {
     taskName: 'pancake_rmLq',
     walletAddr: wallet.address,
-    force: true
   })
 }
 
