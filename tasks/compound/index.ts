@@ -42,7 +42,7 @@ export const run = async (wallet: ethers.Wallet) => {
     const contarct = new ethers.Contract(ca, supplyAbi, signer);
     const tx = await contarct.supply(
       usdcAc,
-      1000000,
+      1000,
       await overrides(wallet.address)
     )
     logGasCost(await tx.wait());
