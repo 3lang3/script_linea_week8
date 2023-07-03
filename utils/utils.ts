@@ -84,15 +84,15 @@ export async function task(cb, opts: {
     return
   }
   console.log(`${text}⌛️执行中...`)
-  const r = withLoop ? await loop(cb) : await cb();
-  
-  const count = (log?.[taskName] || 0) + 1;
-
-  if (r !== false) {
+  try {
+    (withLoop ? await loop(cb) : await cb());
+    const count = (log?.[taskName] || 0) + 1;
     // 确保文件写入成功
     await loop(() => {
       fse.writeJSONSync(logPath, { ...log, [taskName]: count });
       console.log(`✅执行成功!`)
     })
+  } catch (error) {
+    console.log(`❌执行失败: ${error?.reason || error?.message}`)
   }
 }

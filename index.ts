@@ -44,7 +44,7 @@ const main = async (wallet: ethers.Wallet) => {
   await dforce.run(wallet)
   await velocore.run(wallet)
   await gridex.run(wallet)
-  await zkex.run(wallet)
+  // await zkex.run(wallet)
   await symbiosis.run(wallet)
   await openocean.run(wallet);
   await noobysswap.run(wallet);

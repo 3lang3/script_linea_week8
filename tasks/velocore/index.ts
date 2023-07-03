@@ -51,7 +51,6 @@ export const run = async (wallet: ethers.Wallet) => {
       ...await overrides(wallet.address),
     })
     logGasCost(await tx.wait())
-
   }, {
     taskName: 'velocore_add_liquid',
     walletAddr: wallet.address,
