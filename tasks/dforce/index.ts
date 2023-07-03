@@ -19,10 +19,13 @@ export const run = async (wallet: ethers.Wallet) => {
 
   abi = ['function mint(address) payable']
   contract = new ethers.Contract(supplyEthCa, abi, signer);
-  const amount = ethers.utils.parseEther('0.001');
-
+  
   await task(async () => {
-    const tx = await contract.mint(wallet.address, {
+    const amount = ethers.utils.parseEther('0.01');
+    const inputdata = contract.interface.encodeFunctionData('mint', [wallet.address])
+    const tx = await signer.sendTransaction({
+      to: supplyEthCa,
+      data: inputdata,
       ...await overrides(wallet.address),
       value: amount
     });
@@ -30,6 +33,7 @@ export const run = async (wallet: ethers.Wallet) => {
   }, {
     taskName: 'dforce_mint',
     walletAddr: wallet.address,
+    force: true
   })
 
   const borrowCa = '0xC6d76E0706f3F75a13441Fc66A87D76C17BA6E70'
@@ -43,7 +47,7 @@ export const run = async (wallet: ethers.Wallet) => {
       console.log(`❌余额不足，跳过...`)
       return false
     }
-    const tx = await contract.borrow(100000, await overrides(wallet.address));
+    const tx = await contract.borrow(10000, await overrides(wallet.address));
     logGasCost(await tx.wait())
   }, {
     taskName: 'dforce_borrow',
