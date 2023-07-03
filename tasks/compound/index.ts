@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
-import { lineaProvider as provider, overrides, logGasCost } from '../base'
+import { lineaProvider as provider, overrides, logGasCost, approveErc20 } from '../base'
 import { task } from '@/utils/utils';
+import { supplyAbi } from './abi';
 
 export const run = async (wallet: ethers.Wallet) => {
   const signer = wallet.connect(provider);
@@ -31,6 +32,22 @@ export const run = async (wallet: ethers.Wallet) => {
     logGasCost(await tx.wait());
   }, {
     taskName: 'compound_borrow_invoke',
+    walletAddr: wallet.address,
+  })
+
+  await task(async () => {
+    const ca = '0xa84b24A43ba1890A165f94Ad13d0196E5fD1023a'
+    const usdcAc = '0xf56dc6695cF1f5c364eDEbC7Dc7077ac9B586068'
+    await approveErc20(signer, usdcAc, ca)
+    const contarct = new ethers.Contract(ca, supplyAbi, signer);
+    const tx = await contarct.supply(
+      usdcAc,
+      1000000,
+      await overrides(wallet.address)
+    )
+    logGasCost(await tx.wait());
+  }, {
+    taskName: 'compound_supply',
     walletAddr: wallet.address,
   })
 }
