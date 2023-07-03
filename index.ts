@@ -36,7 +36,7 @@ const main = async (wallet: ethers.Wallet) => {
   await airswap.run(wallet)
   await sushiswap.run(wallet)
   await uniswap.run(wallet)
-  // await cashmere.run(wallet) // 领水需要绕过cf才行 暂时跳过
+  await cashmere.run(wallet)
   await izumi.run(wallet)
   await zkusd.run(wallet)
   await squid.run(wallet)
@@ -50,7 +50,11 @@ const main = async (wallet: ethers.Wallet) => {
   await noobysswap.run(wallet);
 }
 
-cli(async ({ pks, startIdx, endIdx }) => {
+cli(async ({ action, pks, startIdx, endIdx }) => {
+  if (action === 'pre_cashmere') {
+    await cashmere.airdropTUSDT();
+    return;
+  }
   for (let k = startIdx; k <= endIdx; k++) {
     const pk = pks[k];
     const wallet = new ethers.Wallet(pk);
