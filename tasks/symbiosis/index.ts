@@ -40,9 +40,33 @@ export const run = async (wallet: ethers.Wallet) => {
         value: amount,
       }
     )
-    logGasCost(await tx.wait())
+    logGasCost(await tx.wait());
   }, {
     taskName: 'symbiosis_swap',
+    walletAddr: wallet.address,
+  })
+
+  await task(async () => {
+    await fetch("https://api-v2.symbiosis.finance/crosschain/v1/testnet-swap-to-linea", {
+      "headers": {
+        "accept": "*/*",
+        "accept-language": "zh-CN,zh;q=0.9",
+        "content-type": "application/json",
+        "sec-ch-ua": "\"Not.A/Brand\";v=\"8\", \"Chromium\";v=\"114\", \"Google Chrome\";v=\"114\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "\"macOS\"",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-site"
+      },
+      "referrerPolicy": "no-referrer",
+      "body": `{\"item\":\"${wallet.address}\"}`,
+      "method": "POST",
+      "mode": "cors",
+      "credentials": "omit"
+    });
+  }, {
+    taskName: 'symbiosis_swap_api',
     walletAddr: wallet.address,
   })
 }
