@@ -90,9 +90,9 @@ export async function task(cb, opts: {
     // 确保文件写入成功
     await loop(() => {
       fse.writeJSONSync(logPath, { ...log, [taskName]: count });
-      console.log(`✅执行成功!`)
+      console.log(`✅[${taskName}]执行成功!`)
     })
   } catch (error) {
-    console.log(`❌执行失败: ${error?.reason || error?.message}`)
+    console.log(`❌[${taskName}]执行失败: ${error?.reason || error?.message}`)
   }
 }
