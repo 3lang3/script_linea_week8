@@ -19,6 +19,7 @@ import * as mendi from './tasks/mendi';
 import * as dforce from './tasks/dforce';
 import * as velocore from './tasks/velocore';
 import * as zkex from './tasks/zkex';
+import * as mes from './tasks/mes';
 import * as symbiosis from './tasks/symbiosis';
 import * as cashmere from './tasks/cashmere';
 import * as openocean from './tasks/openocean';
@@ -48,6 +49,7 @@ const main = async (wallet: ethers.Wallet) => {
   await symbiosis.run(wallet)
   await openocean.run(wallet);
   await noobysswap.run(wallet);
+  await mes.run(wallet)
 }
 
 cli(async ({ action, pks, startIdx, endIdx }) => {
