@@ -20,11 +20,8 @@ export const run = async (wallet: ethers.Wallet) => {
 
   await task(async () => {
 
-    let res: any;
-    await loop(async () => {
-      res = await axios.get('https://squid-api-git-linea-quests-0xsquid.vercel.app/v1/route', {
-        params
-      })
+    let res = await axios.get('https://squid-api-git-linea-quests-0xsquid.vercel.app/v1/route', {
+      params
     })
 
     await approveErc20(
