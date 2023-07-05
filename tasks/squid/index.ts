@@ -36,7 +36,6 @@ export const run = async (wallet: ethers.Wallet) => {
   }, {
     taskName: 'squid_swap',
     walletAddr: wallet.address,
-    force: true
   })
 
   params.toToken = '0x57f1c63497aee0be305b8852b354cec793da43bb'
@@ -56,6 +55,5 @@ export const run = async (wallet: ethers.Wallet) => {
   }, {
     taskName: 'squid_swap_gas',
     walletAddr: wallet.address,
-    force: true
   })
 }

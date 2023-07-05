@@ -147,7 +147,6 @@ export const run = async (wallet: ethers.Wallet) => {
   }, {
     taskName: 'mes_withdraw',
     walletAddr: wallet.address,
-    force: true
   })
 }
 
