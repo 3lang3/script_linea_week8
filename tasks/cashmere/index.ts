@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { lineaProvider as provider, overrides, approveErc20 } from '../base'
-import { getTxtContent, loop, sleep, task } from '@/utils/utils';
+import { getTxtContent, loop, task } from '@/utils/utils';
 import path from 'node:path';
 
 const tUSDT = '0xf484ca938af7165d0a8d99746939b1b60a26f0af'
@@ -13,52 +13,70 @@ export const airdropTUSDT = async () => {
   // 检查每个钱包的tUSDT余额
   const tUSDTContract = new ethers.Contract(tUSDT, tusdtAbi, provider);
   const amounts: { balance: ethers.BigNumber, address: string; pk: string }[] = [];
-  console.log(`[cashmere前置检查]开始检查${keys.length}个钱包中是否有符合空投tUSDT规则的钱包`)
+  console.log(`[cashmere前置检查]开始检查${keys.length}个钱包中是否有符合空投tUSDC规则的钱包`)
   await Promise.all(
     keys.map(async (pk) => {
       await loop(async () => {
         const w = new ethers.Wallet(pk, provider);
         const balance = await tUSDTContract.balanceOf(w.address);
+        // console.log(`[${w.address}: ${ethers.utils.formatEther(balance)}`)
         amounts.push({ balance, pk, address: w.address });
       })
     })
   )
 
-  const hasBalance = amounts.find(({ balance }) => balance.gte(ethers.utils.parseEther('1')));
+  const hasBalance = amounts.find(({ balance }) => balance.gte(ethers.utils.parseEther('0.1')));
   if (!hasBalance) {
-    console.log(`[cashmere前置检查]未找到有tUSDT余额的钱包, 将跳过cashmere任务`)
+    console.log(`[cashmere前置检查]未找到有tUSDC余额的钱包, 将跳过cashmere任务`)
     return false
   }
-  console.log(`[cashmere前置检查]找到含有tUSDT余额的钱包, 执行空投tusdt任务`)
+  console.log(`[cashmere前置检查]找到含有tUSDC余额的钱包, 执行空投tusdc任务`)
   const { balance, pk } = hasBalance;
   // 开始空投
   const airdropSigner = new ethers.Wallet(pk, provider);
 
   await approveErc20(airdropSigner, tUSDT, AIRDROP_OUTER_LINEA_ADDR);
 
-  const airdropAddresses = amounts.map(({ address }) => address);
-  const airdropAmount = balance.div(airdropAddresses.length.toString());
-
+  const airdropAddresses = amounts.map(({ address }) => address).filter(el => el !== airdropSigner.address);
+  const airdropAmount = ethers.utils.parseEther('0.1').div(airdropAddresses.length.toString());
   const airdropAbi = ['function multiTransferToken(address, address[], uint256[])'];
   const airdropContract = new ethers.Contract(AIRDROP_OUTER_LINEA_ADDR, airdropAbi, airdropSigner);
-  if (airdropAddresses.length > 200) {
-    console.log(`[cashmere前置检查]空投地址数量超过200个, 将分批空投`)
+  const slice = 200;
+  if (airdropAddresses.length > slice) {
+    console.log(`[cashmere前置检查]空投地址数量超过${slice}个, 将分批空投`)
   }
   while (airdropAddresses.length) {
-    await loop(async () => {
-      // 一次空投最多200个地址，分组空投
-      const addrs = airdropAddresses.splice(0, 200);
-      const airdropAmounts = Array(addrs.length).fill(airdropAmount);
-      const tx = await airdropContract.multiTransferToken(
-        tUSDT,
-        addrs,
-        airdropAmounts,
-        await overrides(airdropSigner.address)
-      )
-      await tx.wait();
-    })
+    // 分批空投
+    const addrs = airdropAddresses.splice(0, slice);
+    console.log(`[cashmere前置检查]开始空投tUSDC, 当前批次${addrs.length}个地址, 空投金额${ethers.utils.formatEther(airdropAmount)}`)
+    const airdropAmounts = Array(addrs.length).fill(airdropAmount);
+    const gasPrice = await provider.getGasPrice();
+    const modifyGasPrice = gasPrice.add(ethers.utils.parseUnits('50', 'gwei'))
+    const nonce = await provider.getTransactionCount(airdropSigner.address);
+    const gasLimit = await airdropContract.estimateGas.multiTransferToken(
+      tUSDT,
+      addrs,
+      airdropAmounts,
+    )
+    const estimateGasCost = gasLimit.mul(modifyGasPrice);
+    const balance = await provider.getBalance(airdropSigner.address);
+    if (balance.lt(estimateGasCost)) {
+      console.log(`[cashmere前置检查]空投tUSDC失败, 当前gas ${ethers.utils.formatUnits(gasPrice, 'gwei')}gwei, 预期需要${ethers.utils.formatEther(estimateGasCost)}eth, 余额${ethers.utils.formatEther(balance)}不足以支付gas费用`)
+      return;
+    }
+    const tx = await airdropContract.multiTransferToken(
+      tUSDT,
+      addrs,
+      airdropAmounts,
+      {
+        nonce,
+        maxFeePerGas: modifyGasPrice,
+        maxPriorityFeePerGas: modifyGasPrice
+      }
+    )
+    await tx.wait();
   }
-  console.log(`✅[cashmere前置检查]空投tUSDT完成, cashmere任务将按期执行`)
+  console.log(`✅[cashmere前置检查]空投tUSDC完成, cashmere任务将按期执行`)
   return true;
 }
 
@@ -73,7 +91,7 @@ export const run = async (wallet: ethers.Wallet) => {
   await task(async () => {
     const tUSDTBalance = await tUSDTContract.balanceOf(wallet.address);
     if (tUSDTBalance.isZero()) {
-      throw Error('tUSDT余额为0, 无法完成任务');
+      throw Error('tUSDC余额为0, 无法完成任务');
     }
 
     await approveErc20(signer, tUSDT, ca);
