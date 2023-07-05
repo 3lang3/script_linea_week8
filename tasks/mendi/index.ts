@@ -8,14 +8,19 @@ export const supply = async (wallet: ethers.Wallet) => {
   const abi = ['function mint(uint256)']
   const contract = new ethers.Contract(ca, abi, signer);
 
-  // 抵押1usdc
-  const amount = ethers.utils.parseUnits('1', 6);
+
   await task(async () => {
-    await approveErc20(
+    // 抵押1usdc
+    const amount = ethers.utils.parseUnits('1', 6);
+    const usdc = await approveErc20(
       signer,
       '0xf56dc6695cf1f5c364edebc7dc7077ac9b586068',
       ca
     )
+    const usdcBalance = await usdc.balanceOf(wallet.address);
+    if (usdcBalance.lt(amount)) {
+      throw new Error('USDC 余额不足')
+    }
     const tx = await contract.mint(amount, await overrides(wallet.address));
     logGasCost(await tx.wait())
   }, {
@@ -50,7 +55,7 @@ export const borrow = async (wallet: ethers.Wallet) => {
   abi = ['function borrow(uint256)']
   contract = new ethers.Contract(ca, abi, signer);
   await task(async () => {
-    const tx = await contract.borrow(100000, await overrides(wallet.address));
+    const tx = await contract.borrow(1000, await overrides(wallet.address));
     logGasCost(await tx.wait())
   }, {
     taskName: 'mendi_borrow',
