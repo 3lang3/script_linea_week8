@@ -244,7 +244,7 @@ export const rmLq = async (wallet: ethers.Wallet) => {
     let deadline = Math.floor(Date.now() / 1000) + 60 * 2000;
     calldatas.push(iface.encodeFunctionData('decreaseLiquidity', [{
       tokenId: tokenId,
-      liquidity: position.liquidity,
+      liquidity: (position.liquidity as ethers.BigNumber).div(2),
       amount0Min: ethers.constants.Zero,
       amount1Min: ethers.constants.Zero,
       deadline,
