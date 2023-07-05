@@ -40,13 +40,13 @@ export const run = async (wallet: ethers.Wallet) => {
   contract = new ethers.Contract(borrowCa, abi, signer);
   await task(async () => {
     const balance = await getBalanceWithLog(signer);
-    const emitGas = await contract.estimateGas.borrow(100000);
+    const emitGas = await contract.estimateGas.borrow(1000);
     const emitCost = emitGas.mul(await signer.getGasPrice());
     if (emitCost.gt(balance)) {
       console.log(`❌余额不足，跳过...`)
       return false
     }
-    const tx = await contract.borrow(10000, await overrides(wallet.address));
+    const tx = await contract.borrow(1000, await overrides(wallet.address));
     logGasCost(await tx.wait())
   }, {
     taskName: 'dforce_borrow',
