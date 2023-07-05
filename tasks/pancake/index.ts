@@ -218,7 +218,11 @@ export const rmLq = async (wallet: ethers.Wallet) => {
     let tokenId: any
     let tokenIndex = 0;
     while (!position) {
-      tokenId = await contract.tokenOfOwnerByIndex(wallet.address, tokenIndex);
+      try {
+        tokenId = await contract.tokenOfOwnerByIndex(wallet.address, tokenIndex);
+      } catch (error) {
+        throw Error('未找到可移除的池子，请重新添加流动性')
+      }
       position = await contract.positions(tokenId);
       if ((position.liquidity as ethers.BigNumber).isZero()) {
         tokenIndex++;
@@ -226,6 +230,7 @@ export const rmLq = async (wallet: ethers.Wallet) => {
       } else {
         break;
       }
+
     }
     const collectParams = {
       tokenId: Number(tokenId),
