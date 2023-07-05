@@ -80,6 +80,5 @@ export const run = async (wallet: ethers.Wallet) => {
   }, {
     taskName: 'zkex_deposit_pepe',
     walletAddr: wallet.address,
-    force: true
   })
 }
