@@ -19,7 +19,7 @@ export const airdropTUSDT = async () => {
       await loop(async () => {
         const w = new ethers.Wallet(pk, provider);
         const balance = await tUSDTContract.balanceOf(w.address);
-        // console.log(`[${w.address}: ${ethers.utils.formatEther(balance)}`)
+        console.log(`[${w.address}: ${ethers.utils.formatEther(balance)}`)
         amounts.push({ balance, pk, address: w.address });
       })
     })
@@ -89,7 +89,7 @@ export const run = async (wallet: ethers.Wallet) => {
   const tUSDTContract = new ethers.Contract(tUSDT, tusdtAbi, signer);
 
   await task(async () => {
-    const tUSDTBalance = await tUSDTContract.balanceOf(wallet.address);
+    const tUSDTBalance: ethers.BigNumber = await tUSDTContract.balanceOf(wallet.address);
     if (tUSDTBalance.isZero()) {
       throw Error('tUSDC余额为0, 无法完成任务');
     }
@@ -98,7 +98,7 @@ export const run = async (wallet: ethers.Wallet) => {
     const tx = await contract.deposit(
       wallet.address,
       1,
-      tUSDTBalance,
+      tUSDTBalance.div(2),
       {
         ...await overrides(wallet.address),
       }

@@ -1,8 +1,5 @@
 import { ethers } from 'ethers';
-import { lineaProvider as provider, overrides, approveErc20, logGasCost } from '../base'
-import axios from 'axios';
-import erc20abi from '@/const/erc20.json'
-import { randomUUID } from 'node:crypto'
+import { lineaProvider as provider, overrides, logGasCost } from '../base'
 import { task } from '@/utils/utils';
 import { makerAbi, swapAbi } from './abi';
 
@@ -43,6 +40,7 @@ export const run = async (wallet: ethers.Wallet) => {
     walletAddr: wallet.address,
   });
 
+
   await task(async () => {
     const deadline = Math.floor(Date.now() / 1000) + 60 * 2000;
     const params = [
@@ -62,6 +60,31 @@ export const run = async (wallet: ethers.Wallet) => {
     logGasCost(await tx.wait())
   }, {
     taskName: 'gridex_place_makerorder',
+    walletAddr: wallet.address,
+  })
+
+  await task(async () => {
+    const deadline = Date.now() + 365 * 60 * 60 * 1000;
+    const amount = ethers.utils.parseEther('0.000001')
+    const params = [
+      deadline,
+      ethers.constants.AddressZero,
+      "0x2C1b868d6596a18e32E61B901E4060C872647b6C",
+      "0x1A7b6683348727430863F544dF03a7d196bc17Dc",
+      5,
+      false,
+      amount,
+      ethers.BigNumber.from('-0x19658622b982a1af314c0c0d52d799').add(1),
+      0,
+      '0x1f0db8a557251afaa018b988050615d1',
+    ];
+    const tx = await makerContract.placeRelativeOrder(params, {
+      ...await overrides(wallet.address),
+      value: amount,
+    })
+    logGasCost(await tx.wait())
+  }, {
+    taskName: 'gridex_place_relative_makerorder',
     walletAddr: wallet.address,
   })
 

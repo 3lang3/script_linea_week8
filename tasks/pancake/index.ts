@@ -204,7 +204,6 @@ export const addLq = async (wallet: ethers.Wallet) => {
   }, {
     taskName: 'pancake_addLq',
     walletAddr: wallet.address,
-    // force: true,
   })
 }
 
