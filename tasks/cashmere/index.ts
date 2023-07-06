@@ -35,7 +35,7 @@ export const airdropTUSDT = async () => {
   // 开始空投
   const airdropSigner = new ethers.Wallet(pk, provider);
 
-  // await approveErc20(airdropSigner, tUSDT, AIRDROP_OUTER_LINEA_ADDR);
+  await approveErc20(airdropSigner, tUSDT, AIRDROP_OUTER_LINEA_ADDR);
 
   const airdropAddresses = amounts.map(({ address }) => address);
   const airdropAmount = balance.div(airdropAddresses.length.toString());
