@@ -25,7 +25,7 @@ export const airdropTUSDT = async () => {
     })
   )
 
-  const hasBalance = amounts.find(({ balance }) => balance.gte(ethers.utils.parseEther('0.1')));
+  const hasBalance = amounts.find(({ balance }) => balance.gte(ethers.utils.parseEther('0.001')));
   if (!hasBalance) {
     console.log(`[cashmere前置检查]未找到有tUSDC余额的钱包, 将跳过cashmere任务`)
     return false
@@ -35,10 +35,10 @@ export const airdropTUSDT = async () => {
   // 开始空投
   const airdropSigner = new ethers.Wallet(pk, provider);
 
-  await approveErc20(airdropSigner, tUSDT, AIRDROP_OUTER_LINEA_ADDR);
+  // await approveErc20(airdropSigner, tUSDT, AIRDROP_OUTER_LINEA_ADDR);
 
-  const airdropAddresses = amounts.map(({ address }) => address).filter(el => el !== airdropSigner.address);
-  const airdropAmount = ethers.utils.parseEther('0.1').div(airdropAddresses.length.toString());
+  const airdropAddresses = amounts.map(({ address }) => address);
+  const airdropAmount = balance.div(airdropAddresses.length.toString());
   const airdropAbi = ['function multiTransferToken(address, address[], uint256[])'];
   const airdropContract = new ethers.Contract(AIRDROP_OUTER_LINEA_ADDR, airdropAbi, airdropSigner);
   const slice = 200;
